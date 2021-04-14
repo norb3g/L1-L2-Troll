@@ -1,14 +1,14 @@
-import { expect } from './setup'
+const { expect } = require('./setup')
 
-import { ethers } from 'hardhat'
-import { Contract, Signer } from 'ethers'
+const { ethers } = require('hardhat')
+const { Contract, Signer } = require('ethers')
 
 describe('MyERC20', () => {
-  let account1: Signer
-  let account2: Signer
-  let account3: Signer
+  let account1
+  let account2
+  let account3
   before(async () => {
-    ;[account1, account2, account3] = await ethers.getSigners()
+    ;[ account1, account2, account3 ] = await ethers.getSigners()
   })
 
   const name = 'Some Really Cool Token Name'
@@ -16,7 +16,7 @@ describe('MyERC20', () => {
   const decimals = 1
   const symbol = 'ABC'
 
-  let ERC20: Contract
+  let ERC20
   beforeEach(async () => {
     ERC20 = await (await ethers.getContractFactory('MyERC20'))
       .connect(account1)

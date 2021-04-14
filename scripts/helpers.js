@@ -1,57 +1,57 @@
-import { Provider } from '@ethersproject/providers'
-import { Wallet, ContractFactory, Contract } from 'ethers'
-import { getContractFactory, getContractDefinition } from '@eth-optimism/contracts'
+const { Provider } = require('@ethersproject/providers')
+const { Wallet, ContractFactory, Contract } = require('ethers')
+const { getContractFactory, getContractDefinition } = require('@eth-optimism/contracts')
+
+const MyERC20 = require('../artifacts/contracts/MyERC20.sol/MyERC20.json')
+const Def__MyL2DepositedERC20 = require('../artifacts/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.ovm.json')
 
 
-import * as MyERC20 from '../artifacts/contracts/MyERC20.sol/MyERC20.json'
-import * as Def__MyL2DepositedERC20 from '../artifacts/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.ovm.json'
+// export type ConfiguredGateway = {
+//     L1_ERC20: Contract
+//     OVM_L1ERC20Gateway: Contract
+//     OVM_L2DepositedERC20: Contract
+// }
 
+// export type ERC20Config = {
+//     name: string
+//     ticker: string
+//     decimals: number
+//     initialSupply: number
+// }
 
-export type ConfiguredGateway = {
-    L1_ERC20: Contract
-    OVM_L1ERC20Gateway: Contract
-    OVM_L2DepositedERC20: Contract
-}
+// export const defaultERC20Config: ERC20Config = {
+//     name: 'REEERC20',
+//     ticker: 'REE',
+//     decimals: 18,
+//     initialSupply: 1000
+// }
 
-export type ERC20Config = {
-    name: string
-    ticker: string
-    decimals: number
-    initialSupply: number
-}
-
-export const defaultERC20Config: ERC20Config = {
-    name: 'REEERC20',
-    ticker: 'REE',
-    decimals: 18,
-    initialSupply: 1000
-}
-
-export const getDeployedERC20Config = async(
-    provider: Provider,
-    erc20: Contract
-): Promise<ERC20Config> => {
+export const getDeployedERC20Config = async (
+    provider,
+    erc20
+) => {
     // TODO: actually grab from the contract's fields
     return defaultERC20Config
 }
 
 export const deployNewGateway = async (
-    l1Wallet: Wallet,
-    l2Wallet: Wallet,
-    l1ERC20: Contract,
-    l1MessengerAddress: string,
-    l2MessengerAddress: string,
-): Promise<{
-    OVM_L1ERC20Gateway: Contract,
-    OVM_L2DepositedERC20: Contract,
-}> => {
+    l1Wallet,
+    l2Wallet,
+    l1ERC20,
+    l1MessengerAddress,
+    l2MessengerAddress,
+) => {
     let OVM_L1ERC20Gateway
     let OVM_L2DepositedERC20
 
-    const ERC20Config: ERC20Config = await getDeployedERC20Config(l1Wallet.provider, l1ERC20)
-
+    const ERC20Config = await getDeployedERC20Config(l1Wallet.provider, l1ERC20)
     // Deploy L2 ERC20 Gateway
-    const Factory__OVM_L2DepositedERC20 = new ContractFactory(Def__MyL2DepositedERC20.abi, Def__MyL2DepositedERC20.bytecode, l2Wallet)
+    const Factory__OVM_L2DepositedERC20 = new ContractFactory(
+        Def__MyL2DepositedERC20.abi,
+        Def__MyL2DepositedERC20.bytecode,
+        l2Wallet
+    )
+
     OVM_L2DepositedERC20 = await Factory__OVM_L2DepositedERC20.deploy(
         l2MessengerAddress,
         ERC20Config.decimals,
@@ -83,16 +83,16 @@ export const deployNewGateway = async (
 }
 
 export const setupOrRetrieveGateway = async (
-    l1Wallet: Wallet,
-    l2Wallet: Wallet,
-    l1ERC20Address?: string,
-    l1ERC20GatewayAddress?: string,
-    l1MessengerAddress?: string,
-    l2MessengerAddress?: string,
-    ERC20Config: ERC20Config = defaultERC20Config,
-): Promise<ConfiguredGateway> => {
+    l1Wallet,
+    l2Wallet,
+    l1ERC20Address,
+    l1ERC20GatewayAddress,
+    l1MessengerAddress,
+    l2MessengerAddress,
+    ERC20Config
+) => {
     // Deploy or retrieve L1 ERC20
-    let L1_ERC20: Contract
+    let L1_ERC2
     if (
         !l1ERC20Address
     ) {
@@ -106,8 +106,8 @@ export const setupOrRetrieveGateway = async (
         L1_ERC20 = new Contract(l1ERC20Address, MyERC20.abi, l1Wallet)
     }
 
-    let OVM_L1ERC20Gateway: Contract
-    let OVM_L2DepositedERC20: Contract
+    let OVM_L1ERC20Gateway
+    let OVM_L2DepositedERC20
     if (!l1ERC20GatewayAddress) {
         console.log('No gateway contract specified, deploying a new one...')
         const newGateway = await deployNewGateway(l1Wallet, l2Wallet, L1_ERC20, l1MessengerAddress, l2MessengerAddress)
