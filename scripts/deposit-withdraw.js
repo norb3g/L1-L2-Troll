@@ -60,13 +60,13 @@ const main = async () => {
 
   // Approve
   console.log('Approving L1 deposit contract...')
-  const approveTx = await L1_ERC20.approve(OVM_L1ERC20Gateway.address, 1)
+  const approveTx = await L1_ERC20.approve(OVM_L1ERC20Gateway.address, 1, {gasPrice: 0})
   console.log('Approved: https://kovan.etherscan.io/tx/' + approveTx.hash)
   await approveTx.wait()
 
   // Deposit
   console.log('Depositing into L1 deposit contract...')
-  const depositTx = await OVM_L1ERC20Gateway.deposit(1, { gasLimit: 1000000 })
+  const depositTx = await OVM_L1ERC20Gateway.deposit(1, { gasLimit: 1000000, gasPrice: 0 })
   console.log('Deposited: https://kovan.etherscan.io/tx/' + depositTx.hash)
   await depositTx.wait()
 
