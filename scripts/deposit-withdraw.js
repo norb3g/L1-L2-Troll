@@ -1,14 +1,14 @@
 const { JsonRpcProvider, Provider } = require('@ethersproject/providers')
 const { Wallet, ContractFactory, Contract } = require('ethers')
 const { Watcher } = require('@eth-optimism/watcher')
-require('dotenv')
+require('dotenv').config()
 
 const { setupOrRetrieveGateway } = require('./helpers')
 
 const main = async () => {
   // Grab wallets for both chains
-  const l1Provider = new JsonRpcProvider(process.env.L1_WEB3_URL)
-  const l2Provider = new JsonRpcProvider(process.env.L2_WEB3_URL)
+  const l1Provider = new JsonRpcProvider(process.env.ETHEREUM_RPC_URL)
+  const l2Provider = new JsonRpcProvider(process.env.OPTIMISTIC_ETHEREUM_RPC_URL)
   const l1Wallet = new Wallet(process.env.USER_PRIVATE_KEY, l1Provider)
   const l2Wallet = new Wallet(process.env.USER_PRIVATE_KEY, l2Provider)
 

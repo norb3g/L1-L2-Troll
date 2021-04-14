@@ -1,32 +1,21 @@
+/* External Imports */
 const { Provider } = require('@ethersproject/providers')
 const { Wallet, ContractFactory, Contract } = require('ethers')
 const { getContractFactory, getContractDefinition } = require('@eth-optimism/contracts')
 
+/* Internal Imports */
 const MyERC20 = require('../artifacts/contracts/MyERC20.sol/MyERC20.json')
-const Def__MyL2DepositedERC20 = require('../artifacts/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.ovm.json')
+const Def__MyL2DepositedERC20 = require('../artifacts/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.json')
 
+const defaultERC20Config = {
+    name: 'REEERC20',
+    ticker: 'REE',
+    decimals: 18,
+    initialSupply: 1000
 
-// export type ConfiguredGateway = {
-//     L1_ERC20: Contract
-//     OVM_L1ERC20Gateway: Contract
-//     OVM_L2DepositedERC20: Contract
-// }
+}
 
-// export type ERC20Config = {
-//     name: string
-//     ticker: string
-//     decimals: number
-//     initialSupply: number
-// }
-
-// export const defaultERC20Config: ERC20Config = {
-//     name: 'REEERC20',
-//     ticker: 'REE',
-//     decimals: 18,
-//     initialSupply: 1000
-// }
-
-export const getDeployedERC20Config = async (
+const getDeployedERC20Config = async (
     provider,
     erc20
 ) => {
@@ -34,7 +23,7 @@ export const getDeployedERC20Config = async (
     return defaultERC20Config
 }
 
-export const deployNewGateway = async (
+const deployNewGateway = async (
     l1Wallet,
     l2Wallet,
     l1ERC20,
@@ -54,9 +43,10 @@ export const deployNewGateway = async (
 
     OVM_L2DepositedERC20 = await Factory__OVM_L2DepositedERC20.deploy(
         l2MessengerAddress,
-        ERC20Config.decimals,
-        'OVM_' + ERC20Config.name,
-        'ovm' + ERC20Config.ticker
+        defaultERC20Config.decimals,
+        'OVM_' + defaultERC20Config.name,
+        'ovm' + defaultERC20Config.ticker,
+        { gasPrice: 0 }
     )
     await OVM_L2DepositedERC20.deployTransaction.wait()
     console.log('OVM_L2DepositedERC20 deployed to:', OVM_L2DepositedERC20.address)
@@ -66,7 +56,8 @@ export const deployNewGateway = async (
     OVM_L1ERC20Gateway = await Factory__OVM_L1ERC20Gateway.connect(l1Wallet).deploy(
         l1ERC20.address,
         OVM_L2DepositedERC20.address,
-        l1MessengerAddress
+        l1MessengerAddress,
+        { gasPrice: 0 }
     )
     await OVM_L1ERC20Gateway.deployTransaction.wait()
     console.log('OVM_L1ERC20Gateway deployed to:', OVM_L1ERC20Gateway.address)
@@ -82,14 +73,13 @@ export const deployNewGateway = async (
     }
 }
 
-export const setupOrRetrieveGateway = async (
+const setupOrRetrieveGateway = async (
     l1Wallet,
     l2Wallet,
     l1ERC20Address,
     l1ERC20GatewayAddress,
     l1MessengerAddress,
-    l2MessengerAddress,
-    ERC20Config
+    l2MessengerAddress  
 ) => {
     // Deploy or retrieve L1 ERC20
     let L1_ERC2
@@ -97,8 +87,18 @@ export const setupOrRetrieveGateway = async (
         !l1ERC20Address
     ) {
         console.log('No L1 ERC20 specified--deploying a new test ERC20 on L1.')
-        const L1ERC20Factory = new ContractFactory(MyERC20.abi, MyERC20.bytecode, l1Wallet)
-        L1_ERC20 = await L1ERC20Factory.deploy(ERC20Config.decimals, ERC20Config.name, ERC20Config.ticker, ERC20Config.initialSupply)
+        const L1ERC20Factory = new ContractFactory(
+            MyERC20.abi,
+            MyERC20.bytecode,
+            l1Wallet
+        )
+        L1_ERC20 = await L1ERC20Factory.deploy(
+            defaultERC20Config.decimals,
+            defaultERC20Config.name,
+            defaultERC20Config.ticker,
+            defaultERC20Config.initialSupply,
+            { gasPrice: 0 }
+        )
         console.log('New L1_ERC20 deployed to:', L1_ERC20.address)
         l1ERC20Address = L1_ERC20.address
     } else {
@@ -110,11 +110,20 @@ export const setupOrRetrieveGateway = async (
     let OVM_L2DepositedERC20
     if (!l1ERC20GatewayAddress) {
         console.log('No gateway contract specified, deploying a new one...')
-        const newGateway = await deployNewGateway(l1Wallet, l2Wallet, L1_ERC20, l1MessengerAddress, l2MessengerAddress)
+        const newGateway = await deployNewGateway(
+            l1Wallet,
+            l2Wallet,
+            L1_ERC20,
+            l1MessengerAddress,
+            l2MessengerAddress
+        )
         OVM_L1ERC20Gateway = newGateway.OVM_L1ERC20Gateway
         OVM_L2DepositedERC20 = newGateway.OVM_L2DepositedERC20
     } else {
-        const OVM_L1ERC20Gateway_Def = getContractDefinition('OVM_L1ERC20Gateway', false);
+        const OVM_L1ERC20Gateway_Def = getContractDefinition(
+            'OVM_L1ERC20Gateway',
+            false
+        )
         OVM_L1ERC20Gateway = new Contract(l1ERC20GatewayAddress, OVM_L1ERC20Gateway_Def.abi, l1Wallet)
         const l2ERC20GatewayAddress = await OVM_L1ERC20Gateway.l2DepositedToken()
         OVM_L2DepositedERC20 = new Contract(l2ERC20GatewayAddress, Def__MyL2DepositedERC20.abi, l2Wallet)
@@ -126,4 +135,10 @@ export const setupOrRetrieveGateway = async (
         OVM_L1ERC20Gateway,
         OVM_L2DepositedERC20
     }
+}
+
+module.exports = {
+    getDeployedERC20Config,
+    deployNewGateway,
+    setupOrRetrieveGateway
 }
