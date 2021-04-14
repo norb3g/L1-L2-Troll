@@ -51,6 +51,7 @@ const deployNewGateway = async (
     console.log('OVM_L2DepositedERC20 deployed to:', OVM_L2DepositedERC20.address)
 
     // Deploy L1 ERC20 Gateway
+    // TODO: there is a bug in the import logic in getContractFactory
     const Factory__OVM_L1ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
     OVM_L1ERC20Gateway = await Factory__OVM_L1ERC20Gateway.connect(l1Wallet).deploy(
         l1ERC20.address,
@@ -63,7 +64,7 @@ const deployNewGateway = async (
 
     // Init L2 ERC20 Gateway
     console.log('Connecting L2 WETH with L1 Deposit contract...')
-    const initTx = await OVM_L2DepositedERC20.init(OVM_L1ERC20Gateway.address)
+    const initTx = await OVM_L2DepositedERC20.init(OVM_L1ERC20Gateway.address, { gasPrice: 0 })
     await initTx.wait()
 
     return {
@@ -91,6 +92,7 @@ const setupOrRetrieveGateway = async (
             MyERC20.bytecode,
             l1Wallet
         )
+
         L1_ERC20 = await L1ERC20Factory.deploy(
             defaultERC20Config.decimals,
             defaultERC20Config.name,
