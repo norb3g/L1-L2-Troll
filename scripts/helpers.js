@@ -45,7 +45,7 @@ const deployNewGateway = async (
         defaultERC20Config.decimals,
         'OVM_' + defaultERC20Config.name,
         'ovm' + defaultERC20Config.ticker,
-        { gasPrice: 0, gasLimit: 899999, nonce: 1 }
+        { gasPrice: 0 }
     )
     await OVM_L2DepositedERC20.deployTransaction.wait()
     console.log('OVM_L2DepositedERC20 deployed to:', OVM_L2DepositedERC20.address)
@@ -57,7 +57,7 @@ const deployNewGateway = async (
         l1ERC20.address,
         OVM_L2DepositedERC20.address,
         l1MessengerAddress,
-        { gasPrice: 0, gasLimit: 899999 }
+        { gasPrice: 0 }
     )
     await OVM_L1ERC20Gateway.deployTransaction.wait()
     console.log('OVM_L1ERC20Gateway deployed to:', OVM_L1ERC20Gateway.address)
@@ -98,7 +98,7 @@ const setupOrRetrieveGateway = async (
             defaultERC20Config.name,
             defaultERC20Config.ticker,
             defaultERC20Config.initialSupply,
-            { gasPrice: 0, gasLimit: 899999 }
+            { gasPrice: 0 }
         )
         console.log('New L1_ERC20 deployed to:', L1_ERC20.address)
         l1ERC20Address = L1_ERC20.address
