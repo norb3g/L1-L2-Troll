@@ -8,7 +8,7 @@ import {MyERC20} from "./MyERC20.sol";
 /* Library Imports */
 import {
     Abs_L2DepositedToken
-} from "@eth-optimism/contracts/dist/contracts/OVM/bridge/tokens/Abs_L2DepositedToken.sol";
+} from "@eth-optimism/contracts/OVM/bridge/tokens/Abs_L2DepositedToken.sol";
 
 /**
  * @title MyL2DepositedERC20

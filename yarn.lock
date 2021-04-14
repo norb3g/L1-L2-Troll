@@ -18,10 +18,10 @@
   resolved "https://registry.yarnpkg.com/@ensdomains/resolver/-/resolver-0.2.4.tgz#c10fe28bf5efbf49bff4666d909aed0265efbc89"
   integrity sha512-bvaTH34PMCbv6anRa9I/0zjLJgY4EuznbEMgbV77JBCQ9KNC46rzi0avuxpOfu+xDjPEtSFGqVEOr5GlUSGudA==
 
-"@eth-optimism/contracts@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.2.3.tgz#e106c6c2499d142808abd29d59bc54c7331f7024"
-  integrity sha512-sfciDwaKkNFkdwrwr/4qg1Jl2Rlzmyp5R+Jhenu5lHr6rbtxwYfhraaYj4FuWwg8OX1+nAG4SWnU3I9AIADvUA==
+"@eth-optimism/contracts@^0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/contracts/-/contracts-0.2.4.tgz#b54cc64c914cabc650942035556664eb003957ae"
+  integrity sha512-ddYFjJ0aEGYY66/YvAI3zjEsHHxxOpUVK4yRQL1JGioNc/we+tkrUOtg6mgmNgEsZRJC5fQsQBsAVdkLDKyn6A==
   dependencies:
     "@eth-optimism/core-utils" "^0.2.1"
     "@eth-optimism/solc" "^0.6.12-alpha.1"
