@@ -3,11 +3,13 @@ const { Watcher } = require('@eth-optimism/watcher')
 const { getContractFactory } = require('@eth-optimism/contracts')
 
 // Set up some contract factories. You can ignore this stuff.
+const factory = (name, ovm = false) => {
+  const artifact = require(`./artifacts${ovm ? '-ovm' : ''}/contracts/${name}.sol/${name}.json`)
+  return new ethers.ContractFactory(artifact.abi, artifact.bytecode)
+}
+const factory__L1_ERC20 = factory('MyERC20')
+const factory__L2_ERC20 = factory('MyL2DepositedERC20', true)
 const factory__L1_ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
-const artifact__L1_ERC20 = require('./artifacts/contracts/MyERC20.sol/MyERC20.json')
-const factory__L1_ERC20 = new ethers.ContractFactory(artifact__L1_ERC20.abi, artifact__L1_ERC20.bytecode)
-const artifact__L2_ERC20 = require('./artifacts-ovm/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.json')
-const factory__L2_ERC20 = new ethers.ContractFactory(artifact__L2_ERC20.abi, artifact__L2_ERC20.bytecode)
 
 async function main() {
   // Set up our RPC provider connections.
@@ -21,8 +23,9 @@ async function main() {
   const l1Wallet = new ethers.Wallet(key, l1RpcProvider)
   const l2Wallet = new ethers.Wallet(key, l2RpcProvider)
 
-  // TODO (this is the last one I think)
+  // L1 messenger address depends on the deployment, this is default for our local deployment.
   const l1MessengerAddress = '0x59b670e9fA9D0A427751Af201D676719a970857b'
+  // L2 messenger address is always the same.
   const l2MessengerAddress = '0x4200000000000000000000000000000000000007'
 
   // Tool that helps watches and waits for messages to be relayed between L1 and L2.
