@@ -3,8 +3,10 @@ const { Watcher } = require('@eth-optimism/watcher')
 const { getContractFactory } = require('@eth-optimism/contracts')
 
 const factory__L1_ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
-const factory__L1_ERC20 = require('../artifacts/contracts/MyERC20.sol/MyERC20.json')
-const factory__L2_ERC20 = require('../artifacts/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.json')
+const artifact__L1_ERC20 = require('./artifacts/contracts/MyERC20.sol/MyERC20.json')
+const factory__L1_ERC20 = new ethers.ContractFactory(artifact__L1_ERC20.abi, artifact__L1_ERC20.bytecode)
+const artifact__L2_ERC20 = require('./artifacts-ovm/contracts/MyL2DepositedERC20.sol/MyL2DepositedERC20.json')
+const factory__L2_ERC20 = new ethers.ContractFactory(artifact__L2_ERC20.abi, artifact__L2_ERC20.bytecode)
 
 async function main() {
   // Set up our RPC provider connections.
@@ -19,10 +21,8 @@ async function main() {
   const l2Wallet = new ethers.Wallet(key, l2RpcProvider)
 
   // TODO (this is the last one I think)
-  const {
-    l1MessengerAddress,
-    l2MessengerAddress
-  } = {}
+  const l1MessengerAddress = '0x59b670e9fA9D0A427751Af201D676719a970857b'
+  const l2MessengerAddress = '0x4200000000000000000000000000000000000007'
 
   // Tool that helps watches and waits for messages to be relayed between L1 and L2.
   const watcher = new Watcher({
@@ -37,6 +37,7 @@ async function main() {
   })
 
   // Deploy an ERC20 token on L1.
+  console.log('Deploying L1 ERC20...')
   const L1_ERC20 = await factory__L1_ERC20.connect(l1Wallet).deploy(
     18, //decimals
     'My ERC20', //name
@@ -46,15 +47,20 @@ async function main() {
   await L1_ERC20.deployTransaction.wait()
 
   // Deploy the paired ERC20 token to L2.
+  console.log('Deploying L2 ERC20...')
   const L2_ERC20 = await factory__L2_ERC20.connect(l2Wallet).deploy(
     l2MessengerAddress,
     18, //decimals
     'My L2 ERC20', //name
     'myL2ERC20', //ticker
+    {
+      gasPrice: 0
+    }
   )
   await L2_ERC20.deployTransaction.wait()
 
   // Create a gateway that connects the two contracts.
+  console.log('Deploying L1 ERC20 Gateway...')
   const L1_ERC20Gateway = await factory__L1_ERC20Gateway.connect(l1Wallet).deploy(
     L1_ERC20.address,
     L2_ERC20.address,
@@ -62,33 +68,57 @@ async function main() {
   )
   await L1_ERC20Gateway.deployTransaction.wait()
 
+  // Make the L2 ERC20 aware of the gateway contract.
+  console.log('Initializing L2 ERC20...')
+  const tx0 = await L2_ERC20.init(
+    L1_ERC20Gateway.address,
+    {
+      gasPrice: 0
+    }
+  )
+  await tx0.wait()
+
+  // Initial balances.
+  console.log(`Balance on L1: ${await L1_ERC20.balanceOf(l1Wallet.address)}`) // 1234
+  console.log(`Balance on L2: ${await L2_ERC20.balanceOf(l1Wallet.address)}`) // 0
+
   // Allow the gateway to lock up some of our tokens.
+  console.log('Approving tokens for ERC20 gateway...')
   const tx1 = await L1_ERC20.approve(L1_ERC20Gateway.address, 1234)
   await tx1.wait()
 
   // Lock the tokens up inside the gateway and ask the L2 contract to mint new ones.
+  console.log('Depositing tokens into L2 ERC20...')
   const tx2 = await L1_ERC20Gateway.deposit(1234)
   await tx2.wait()
 
   // Wait for the message to be relayed to L2.
+  console.log('Waiting for deposit to be relayed to L2...')
   const [ msgHash1 ] = await watcher.getMessageHashesFromL1Tx(tx2.hash)
   await watcher.getL2TransactionReceipt(msgHash1)
 
   // Log some balances to see that it worked!
-  console.log(await L1_ERC20.balanceOf(l1Wallet.address)) // 0
-  console.log(await L2_ERC20.balanceOf(l1Wallet.address)) // 1234
+  console.log(`Balance on L1: ${await L1_ERC20.balanceOf(l1Wallet.address)}`) // 0
+  console.log(`Balance on L2: ${await L2_ERC20.balanceOf(l1Wallet.address)}`) // 1234
 
   // Burn the tokens on L2 and ask the L1 contract to unlock on our behalf.
-  const tx3 = await L2_ERC20.withdraw(1234)
+  console.log(`Withdrawing tokens back to L1 ERC20...`)
+  const tx3 = await L2_ERC20.withdraw(
+    1234,
+    {
+      gasPrice: 0
+    }
+  )
   await tx3.wait()
 
   // Wait for the message to be relayed to L1.
+  console.log(`Waiting for withdrawal to be relayed to L1...`)
   const [ msgHash2 ] = await watcher.getMessageHashesFromL2Tx(tx3.hash)
   await watcher.getL1TransactionReceipt(msgHash2)
 
   // Log balances again!
-  console.log(await L1_ERC20.balanceOf(l1Wallet.address)) // 1234
-  console.log(await L2_ERC20.balanceOf(l1Wallet.address)) // 0
+  console.log(`Balance on L1: ${await L1_ERC20.balanceOf(l1Wallet.address)}`) // 1234
+  console.log(`Balance on L2: ${await L2_ERC20.balanceOf(l1Wallet.address)}`) // 0
 }
 
 main()

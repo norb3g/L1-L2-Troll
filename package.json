@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf ./cache && rimraf ./artifacts",
-    "compile": "yarn clean && hardhat compile",
-    "deposit-withdraw": "node ./scripts/deposit-withdraw.js"
+    "compile": "yarn clean && hardhat compile"
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.2.4",
