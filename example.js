@@ -2,6 +2,7 @@ const ethers = require('ethers')
 const { Watcher } = require('@eth-optimism/watcher')
 const { getContractFactory } = require('@eth-optimism/contracts')
 
+// Set up some contract factories. You can ignore this stuff.
 const factory__L1_ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
 const artifact__L1_ERC20 = require('./artifacts/contracts/MyERC20.sol/MyERC20.json')
 const factory__L1_ERC20 = new ethers.ContractFactory(artifact__L1_ERC20.abi, artifact__L1_ERC20.bytecode)
