@@ -7,8 +7,8 @@ const factory = (name, ovm = false) => {
   const artifact = require(`./artifacts${ovm ? '-ovm' : ''}/contracts/${name}.sol/${name}.json`)
   return new ethers.ContractFactory(artifact.abi, artifact.bytecode)
 }
-const factory__L1_ERC20 = factory('MyERC20')
-const factory__L2_ERC20 = factory('MyL2DepositedERC20', true)
+const factory__L1_ERC20 = factory('ERC20')
+const factory__L2_ERC20 = factory('L2DepositedERC20', true)
 const factory__L1_ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
 
 async function main() {
@@ -43,10 +43,8 @@ async function main() {
   // Deploy an ERC20 token on L1.
   console.log('Deploying L1 ERC20...')
   const L1_ERC20 = await factory__L1_ERC20.connect(l1Wallet).deploy(
-    18, //decimals
-    'My ERC20', //name
-    'myERC20', //ticker
     1234, //initialSupply
+    'L1 ERC20', //name
   )
   await L1_ERC20.deployTransaction.wait()
 
@@ -54,9 +52,7 @@ async function main() {
   console.log('Deploying L2 ERC20...')
   const L2_ERC20 = await factory__L2_ERC20.connect(l2Wallet).deploy(
     l2MessengerAddress,
-    18, //decimals
-    'My L2 ERC20', //name
-    'myL2ERC20', //ticker
+    'L2 ERC20', //name
     {
       gasPrice: 0
     }
