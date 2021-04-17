@@ -1,18 +1,18 @@
 # L1/L2 ERC20 Deposit + Withdrawal Example
 
-## Prerequisite Software
-
-- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Node.js](https://nodejs.org/en/download/)
-- [Yarn](https://classic.yarnpkg.com/en/docs/install#mac-stable)
-- [Docker](https://docs.docker.com/engine/install/)
-
 ## Introduction
 
 In this example repository we will walk through how to add L1 <> L2 message passing in your application.
 
 Message passing is automatically done for all Optimistic Ethereum transactions, but retrieving these messages is something that you must implement yourself in your application.
 _Message passing_ is used to pass data from L1 to L2 or from L2 to L1.
+
+## Prerequisite Software
+
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node.js](https://nodejs.org/en/download/)
+- [Yarn](https://classic.yarnpkg.com/en/docs/install#mac-stable)
+- [Docker](https://docs.docker.com/engine/install/)
 
 ## L1 <> L2 Communication: Brief Summary
 
