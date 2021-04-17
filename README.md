@@ -1,8 +1,5 @@
 # L1/L2 ERC20 Deposit + Withdrawal Example
 
-Sorry, I haven't had time to fill out this readme fully!
-This brief readme will have to do for now.
-
 ## Prerequisite Software
 
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
