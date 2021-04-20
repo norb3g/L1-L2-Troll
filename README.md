@@ -22,10 +22,6 @@ Then, the [`L2CrossDomainMessenger`](https://github.com/ethereum-optimism/optimi
 
 Similarly, for an L2 to L1 deposit-withdrawal, message passing would start at the `L2CrossDomainMessenger` calling `sendMessage` and end with the message being relayed by the `L1CrossDomainMessenger` to L1.
 
-This message passing system can be visualized by the diagram below.
-
-![Optimistic Ethereum Message Passing](./assets/passing-messages-between-l1-and-l2.png)
-
 For further information, you can review our [documentation on L1 <> L2 Communication on our community hub](https://community.optimism.io/docs/developers/integration.html#%E2%98%8E%EF%B8%8F-l1-l2-communication).
 
 ## Message Passing in this Example
