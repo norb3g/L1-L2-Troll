@@ -9,3 +9,6 @@ cache-ovm/
 optimism
 
 .env
+start_remixd
+.deps
+.idea
