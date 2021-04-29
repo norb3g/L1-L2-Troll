@@ -32,10 +32,10 @@ contract L2Bank is Ownable {
     constructor(
         address[] memory _l2TokenAddresses,
         address[] memory _l2WrappedTokenAddresses
-    ) {
+    ) public {
         require(_l2TokenAddresses.length == _l2WrappedTokenAddresses.length, "WRONG_CONSTRUCTOR_INPUT");
 
-        for (uint i; i < _l2TokenAddresses.length; i++) {
+        for (uint i = 0; i < _l2TokenAddresses.length; i++) {
             l2TokenMap[_l2TokenAddresses[i]] = _l2WrappedTokenAddresses[i];
         }
     }

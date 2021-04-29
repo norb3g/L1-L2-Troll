@@ -16,13 +16,13 @@ const factory = (name, ovm = false) => {
 }
 const factory__L1_ERC20 = factory('ERC20')
 const factory__L2_ERC20 = factory('L2DepositedERC20', true)
-const factory__L1_ERC20Gateway = factory('OVM_L1ERC20Gateway', false)
+const factory__L1_ERC20Gateway = getContractFactory('OVM_L1ERC20Gateway')
 
 const factory__L2_ExtendedERC20 = factory('ExtendedL2DepositedERC20', true)
 const factory__L1_ExtendedERC20Gateway = factory('ExtendedOVM_L1ERC20Gateway', false)
 const factory__L1_WERC20 = factory('L1WERC20')
 const factory__L1_BANK = factory('L1Bank')
-const factory__L2_BANK = factory('L2Bank')
+const factory__L2_BANK = factory('L2Bank', true)
 
 async function main() {
     const l1RpcProvider = new ethers.providers.JsonRpcProvider(l1RpcProviderUrl)
@@ -78,8 +78,9 @@ async function main() {
     //3. deploy wrapped ERC20 to L1 (trollUSDT)
     console.log('Deploying L1 WERC20...')
     const L1_WERC20 = await factory__L1_WERC20.connect(l1OwnerWallet).deploy(
-        0, //initialSupply
+        L1_ERC20.address, //initialSupply
         'L1_trollUSDT', //name
+        'L1_trollUSDT', //symbol
     )
     await L1_WERC20.deployTransaction.wait()
 
@@ -124,7 +125,7 @@ async function main() {
     //8. deploy L2 Bank to L2
     console.log('Deploying L2 BANK...')
     const L2_BANK = await factory__L2_BANK.connect(l2OwnerWallet).deploy(
-        [L2_ERC20],
+        [L2_ERC20.address],
         [L2_ExtendedERC20.address]
     )
     await L2_BANK.deployTransaction.wait()

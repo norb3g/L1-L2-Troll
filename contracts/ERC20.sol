@@ -7,6 +7,8 @@ pragma solidity >0.6.0 <0.8.0;
  */
 contract ERC20 {
 
+    uint8 public decimals = 18;
+
     /**********
      * Events *
      **********/
