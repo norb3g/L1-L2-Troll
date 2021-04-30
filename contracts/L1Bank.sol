@@ -15,7 +15,7 @@ contract L1Bank is IL1Bank, Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    mapping(address => address) l1GatewayMap;
+    mapping(address => address) public l1GatewayMap;
 
     struct WithdrawalData {
         address tokenAddress;
