@@ -15,7 +15,7 @@ contract L1Bank is IL1Bank, Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    mapping(address => address) public l1GatewayMap;
+    mapping(address => address) public l1WrappedGatewayMap;
 
     struct WithdrawalData {
         address tokenAddress;
@@ -61,11 +61,11 @@ contract L1Bank is IL1Bank, Ownable {
     event ProcessedNotProcessedWithdrawalPenalty();
 
     constructor(
-        address[] memory _l1Gateways,
-        address[] memory _l1Tokens
+        address[] memory _l1WrappedGateways,
+        address[] memory _l1WrappedTokens
     ) {
-        for (uint i; i < _l1Gateways.length; i++) {
-            l1GatewayMap[_l1Gateways[i]] = _l1Tokens[i];
+        for (uint i; i < _l1WrappedGateways.length; i++) {
+            l1WrappedGatewayMap[_l1WrappedGateways[i]] = _l1WrappedTokens[i];
         }
     }
 
@@ -78,7 +78,7 @@ contract L1Bank is IL1Bank, Ownable {
     override
     external
     {
-        require(l1GatewayMap[msg.sender] != address(0), "ONLY_GATEWAY_IS_ALLOWED_TO_CALL_THIS_FUNCTION");
+        require(l1WrappedGatewayMap[msg.sender] != address(0), "ONLY_GATEWAY_IS_ALLOWED_TO_CALL_THIS_FUNCTION");
         address l1WrappedTokenAddress = address(ExtendedOVM_L1ERC20Gateway(msg.sender).l1ERC20());
         address l1TokenAddress = L1WERC20(l1WrappedTokenAddress).erc20Address();
         WithdrawalData storage withdrawalData = withdrawals[userAddress][userNonce];

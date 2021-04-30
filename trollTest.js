@@ -105,7 +105,7 @@ async function main() {
         factory__L1_BANK,
         "L1_BANK",
         l1OwnerWallet,
-        [[L1_ERC20Gateway.address], [L1_ERC20.address]]
+        [[L1_ExtendedERC20Gateway.address], [L1_WERC20.address]]
     );
 
     //6. initialize L2 ERC20 with L1 gateway
