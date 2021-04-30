@@ -59,8 +59,8 @@ abstract contract ExtendedAbs_L1TokenGateway is Abs_L1TokenGateway {
         bytes memory _data
     )
     external
-    //todo uncomment after tests
-    //    onlyFromCrossDomainAccount(l2DepositedToken)
+        //todo comment for tests
+    onlyFromCrossDomainAccount(l2DepositedToken)
     {
         // Call our withdrawal accounting handler implemented by child contracts.
         _handleFinalizeWithdrawalAndCall(
