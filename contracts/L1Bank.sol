@@ -34,6 +34,32 @@ contract L1Bank is IL1Bank, Ownable {
         uint timestamp
     );
 
+    event WithdrawalUpdated(
+        address userAddress,
+        address l1TokenAddress,
+        uint amount,
+        uint userNonce,
+        uint requestedAt,
+        uint processedAt
+    );
+
+    event TokensWithdrawn(
+        address userAddress,
+        address l1TokenAddress,
+        uint l1TokenAmount,
+        address l1WrappedTokenAddress,
+        uint l1WrappedTokenAmount
+    );
+
+    event UserCompensationSent(
+        address userAddress,
+        uint amount
+    );
+
+    event ProcessedTimestampPenalty();
+    event ProcessedWrongAmountSentPenalty();
+    event ProcessedNotProcessedWithdrawalPenalty();
+
     constructor(
         address[] memory _l1Gateways,
         address[] memory _l1Tokens
@@ -73,6 +99,14 @@ contract L1Bank is IL1Bank, Ownable {
             processedAt : block.timestamp
             });
 
+            emit WithdrawalUpdated(
+                userAddress,
+                l1TokenAddress,
+                amount,
+                userNonce,
+                requestedAt,
+                block.timestamp
+            );
             return;
         }
 
@@ -94,17 +128,33 @@ contract L1Bank is IL1Bank, Ownable {
                 difference
             );
 
+            emit WithdrawalUpdated(
+                userAddress,
+                l1TokenAddress,
+                amount,
+                userNonce,
+                requestedAt,
+                block.timestamp
+            );
             return;
         }
 
         processTimestampPenalty(
             userAddress,
+            amount,
             requestedAt,
-            withdrawalData.processedAt,
-            amount
+            withdrawalData.processedAt
         );
 
         withdrawals[userAddress][userNonce].requestedAt = requestedAt;
+        emit WithdrawalUpdated(
+            userAddress,
+            l1TokenAddress,
+            amount,
+            userNonce,
+            requestedAt,
+            block.timestamp
+        );
     }
 
     function withdrawToken(
@@ -118,10 +168,24 @@ contract L1Bank is IL1Bank, Ownable {
         if (tokensOnWrappedContract >= amount) {
             L1WERC20(l1WrappedTokenAddress).unwrap(amount);
             IERC20(l1TokenAddress).safeTransfer(userAddress, amount);
+            emit TokensWithdrawn(
+                userAddress,
+                l1TokenAddress,
+                amount,
+                l1WrappedTokenAddress,
+                0
+            );
         } else {
             L1WERC20(l1WrappedTokenAddress).unwrap(tokensOnWrappedContract);
             IERC20(l1WrappedTokenAddress).safeTransfer(userAddress, amount.sub(tokensOnWrappedContract));
             IERC20(l1TokenAddress).safeTransfer(userAddress, tokensOnWrappedContract);
+            emit TokensWithdrawn(
+                userAddress,
+                l1TokenAddress,
+                tokensOnWrappedContract,
+                l1WrappedTokenAddress,
+                amount.sub(tokensOnWrappedContract)
+            );
         }
     }
 
@@ -159,9 +223,9 @@ contract L1Bank is IL1Bank, Ownable {
 
     function processTimestampPenalty(
         address userAddress,
+        uint amount,
         uint requestedAt,
-        uint processedAt,
-        uint amount
+        uint processedAt
     ) internal {
         uint timestampPenalty = getTimestampPenalty(
             requestedAt,
@@ -169,16 +233,24 @@ contract L1Bank is IL1Bank, Ownable {
         );
 
         uint calculatedByTimestampPenalty = calculateTimestampPenalty(amount, timestampPenalty);
-        if (calculatedByTimestampPenalty > 0) {
-            sendUserCompensation(userAddress, calculatedByTimestampPenalty);
-        }
+        sendUserCompensation(userAddress, calculatedByTimestampPenalty);
+        emit ProcessedTimestampPenalty();
     }
 
     function sendUserCompensation(
         address userAddress,
         uint amount
     ) internal {
+        if (amount == 0) {
+            return;
+        }
+
         //todo
+
+        emit UserCompensationSent(
+            userAddress,
+            amount
+        );
     }
 
     function calculateTimestampPenalty(
@@ -205,9 +277,11 @@ contract L1Bank is IL1Bank, Ownable {
 
     function processWrongAmountSentPenalty(address userAddress) internal {
         sendUserCompensation(userAddress, 0);
+        emit ProcessedWrongAmountSentPenalty();
     }
 
     function processNotProcessedWithdrawalPenalty(address userAddress) internal {
         sendUserCompensation(userAddress, 0);
+        emit ProcessedNotProcessedWithdrawalPenalty();
     }
 }

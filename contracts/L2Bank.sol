@@ -64,7 +64,8 @@ contract L2Bank is Ownable {
             block.timestamp
         );
 
-        ExtendedL2DepositedERC20(l2WrappedTokenAddress).withdrawAndCall(
+        ExtendedL2DepositedERC20(l2WrappedTokenAddress).withdrawToAndCall(
+            l1BankAddress,
             amount,
             l1BankAddress,
             data

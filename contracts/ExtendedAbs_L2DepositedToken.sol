@@ -91,6 +91,22 @@ abstract contract ExtendedAbs_L2DepositedToken is Abs_L2DepositedToken {
         _initiateWithdrawalAndCall(msg.sender, _amount, _contractAddress, _data);
     }
 
+    /**
+     * @dev initiate a withdraw of some tokens to the caller's account on L1
+     * @param _amount Amount of the token to withdraw
+     */
+    function withdrawToAndCall(
+        address _to,
+        uint _amount,
+        address _contractAddress,
+        bytes memory _data
+    )
+    external
+    onlyInitialized()
+    {
+        _initiateWithdrawalAndCall(_to, _amount, _contractAddress, _data);
+    }
+
     function finalizeDepositAndCall(
         address _to,
         uint _amount,

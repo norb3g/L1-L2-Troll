@@ -12,3 +12,5 @@ optimism
 start_remixd
 .deps
 .idea
+
+.PREDEPLOYED_ADDRESSES.json

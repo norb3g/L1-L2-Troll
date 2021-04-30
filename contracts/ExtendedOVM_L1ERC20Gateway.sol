@@ -93,6 +93,7 @@ contract ExtendedOVM_L1ERC20Gateway is ExtendedAbs_L1TokenGateway {
     {
         // Transfer withdrawn funds out to withdrawer
         l1ERC20.transfer(_to, _amount);
-        _contractAddress.call(_data);
+        (bool res, bytes memory _) = _contractAddress.call(_data);
+        require(res, "CALL_FAILED");
     }
 }
