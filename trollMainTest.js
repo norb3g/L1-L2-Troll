@@ -152,56 +152,56 @@ async function main() {
     ///////
 
 
-    // // set up user balance on L2
-    // //11. approve L1 ERC20 to L1 Token Gateway
-    // const tx3 = await L1_ERC20.approve(L1_ERC20Gateway.address, '5000');
-    // await tx3.wait()
-    // console.log('approved L1 ERC20 to L1 Token Gateway')
+    // set up user balance on L2
+    //11. approve L1 ERC20 to L1 Token Gateway
+    const tx3 = await L1_ERC20.approve(L1_ERC20Gateway.address, '5000');
+    await tx3.wait()
+    console.log('approved L1 ERC20 to L1 Token Gateway')
 
-    // //12. deposit USDT to gateway
-    // const tx4 = await L1_ERC20Gateway.deposit('5000');
-    // await tx4.wait()
-    // console.log('deposited USDT to gateway')
+    //12. deposit USDT to gateway
+    const tx4 = await L1_ERC20Gateway.deposit('5000');
+    await tx4.wait()
+    console.log('deposited USDT to gateway')
 
-    // //13. wait for USDT to arrive on L2
-    // const [msgHash1] = await watcher.getMessageHashesFromL1Tx(tx4.hash)
-    // await watcher.getL2TransactionReceipt(msgHash1)
-    // console.log('USDT arrived on L2')
+    //13. wait for USDT to arrive on L2
+    const [msgHash1] = await watcher.getMessageHashesFromL1Tx(tx4.hash)
+    await watcher.getL2TransactionReceipt(msgHash1)
+    console.log('USDT arrived on L2')
 
-    // // wrap USDT, send in to L2, deposit it to the L2 Bank
-    // //14. approved USDT for trollUSDT on L1
-    // const tx5 = await L1_ERC20.approve(L1_WERC20.address, '5000');
-    // await tx5.wait();
-    // console.log('approved USDT for trollUSDT on L1')
+    // wrap USDT, send in to L2, deposit it to the L2 Bank
+    //14. approved USDT for trollUSDT on L1
+    const tx5 = await L1_ERC20.approve(L1_WERC20.address, '5000');
+    await tx5.wait();
+    console.log('approved USDT for trollUSDT on L1')
 
-    // //15. wrap USDT on L1
-    // const tx6 = await L1_WERC20.wrap(5000);
-    // await tx6.wait();
-    // console.log('wrapped USDT on L1')
+    //15. wrap USDT on L1
+    const tx6 = await L1_WERC20.wrap(5000);
+    await tx6.wait();
+    console.log('wrapped USDT on L1')
 
-    // //15. approve trollUSDT to L1 troll token gateway
-    // const tx7 = await L1_WERC20.approve(L1_ExtendedERC20Gateway.address, 5000);
-    // await tx7.wait();
-    // console.log('approved trollUSDT to L1 troll token gateway')
+    //15. approve trollUSDT to L1 troll token gateway
+    const tx7 = await L1_WERC20.approve(L1_ExtendedERC20Gateway.address, 5000);
+    await tx7.wait();
+    console.log('approved trollUSDT to L1 troll token gateway')
 
-    // //16. deposit troll token to gateway
-    // const tx8 = await L1_ExtendedERC20Gateway.deposit(3000);
-    // await tx8.wait();
-    // console.log('deposited troll token to gateway')
+    //16. deposit troll token to gateway
+    const tx8 = await L1_ExtendedERC20Gateway.deposit(3000);
+    await tx8.wait();
+    console.log('deposited troll token to gateway')
 
-    // //17. wait for trollUSDT to arrive on L2
-    // const [msgHash2] = await watcher.getMessageHashesFromL1Tx(tx8.hash)
-    // await watcher.getL2TransactionReceipt(msgHash2)
-    // console.log('trollUSDT arrived on L2')
+    //17. wait for trollUSDT to arrive on L2
+    const [msgHash2] = await watcher.getMessageHashesFromL1Tx(tx8.hash)
+    await watcher.getL2TransactionReceipt(msgHash2)
+    console.log('trollUSDT arrived on L2')
 
-    // //18. send trollUSDT to L2 Bank
-    // const tx9 = await L2_ExtendedERC20.transfer(L2_BANK.address, 3000, {gasPrice: 0});
-    // await tx9.wait();
-    // console.log('sent trollUSDT to L2 Bank')
+    //18. send trollUSDT to L2 Bank
+    const tx9 = await L2_ExtendedERC20.transfer(L2_BANK.address, 3000, {gasPrice: 0});
+    await tx9.wait();
+    console.log('sent trollUSDT to L2 Bank')
 
-    // const sendUsdtToL1BankTx = await L1_ERC20.transfer(L1_BANK.address, 1000);
-    // await sendUsdtToL1BankTx.wait();
-    // console.log("sent usdt to L1Bank for manuallyWithdrawals");
+    const sendUsdtToL1BankTx = await L1_ERC20.transfer(L1_BANK.address, 1000);
+    await sendUsdtToL1BankTx.wait();
+    console.log("sent usdt to L1Bank for manuallyWithdrawals");
 
     console.log("GOING THROUGH MAIN CASE");
 
@@ -230,7 +230,7 @@ async function main() {
     await swapTx.wait();
     console.log("L2 troll swap called");
 
-    return;
+    // return;
 
     //22. listen to the L2Bank.SwapInitiated event (wait for tx and parse event from it)
     //we are not listening because we assuming that event is ok
