@@ -11,10 +11,24 @@ import {IL1Bank} from "./IL1Bank.sol";
 contract L2Bank is Ownable {
 //    using SafeERC20 for IERC20;
 
+    struct WithdrawalRequest {
+        address userAddress;
+        address l2WrappedTokenAddress;
+        uint amount;
+        uint creationTime;
+        uint userRequestNonce;
+        uint blockNumber;
+    }
+
+    uint public withdrawalRequestsLength;
+    WithdrawalRequest[] public withdrawalRequests;
+
     address public l1BankAddress;
     bool public initilized;
     mapping(address => uint) public userRequestMap;
     mapping(address => address) public l2TokenMap;
+
+    
 
     event SwapInitiated(
         address indexed userAddress,
@@ -71,7 +85,17 @@ contract L2Bank is Ownable {
             data
         );
 
-        userRequestMap[msg.sender]++;
+        withdrawalRequests.push(WithdrawalRequest({
+            userAddress: msg.sender,
+            l2WrappedTokenAddress: l2WrappedTokenAddress,
+            amount: amount,
+            creationTime: block.timestamp,
+            userRequestNonce: userRequestMap[msg.sender],
+            blockNumber: block.number
+        }));
+
+        withdrawalRequestsLength = withdrawalRequests.length;
+
         emit SwapInitiated(
             msg.sender,
             l2WrappedTokenAddress,
@@ -79,5 +103,7 @@ contract L2Bank is Ownable {
             block.timestamp,
             userRequestMap[msg.sender]
         );
+
+        userRequestMap[msg.sender]++;
     }
 }
